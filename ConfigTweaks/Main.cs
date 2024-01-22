@@ -9,7 +9,7 @@ using System.IO;
 
 namespace ConfigTweaks
 {
-    [BepInPlugin("com.aidanamite.ConfigTweaks", "Config Tweaks", "1.0.0")]
+    [BepInPlugin("com.aidanamite.ConfigTweaks", "Config Tweaks", "1.1.0")]
     public class Main : BaseUnityPlugin
     {
         internal static bool saving = false;
@@ -41,7 +41,7 @@ namespace ConfigTweaks
             foreach (var f in plugin.GetType().GetFields(~BindingFlags.Default))
             {
                 var a = f.GetCustomAttribute<ConfigFieldAttribute>();
-                if (a != null && FieldConfigEntry.TryCreate(plugin.Config, new ConfigDefinition(a.Section, a.Key ?? f.Name), plugin, f, null, out var e))
+                if (a != null && FieldConfigEntry.TryCreate(plugin.Config, new ConfigDefinition(a.Section, a.Key ?? f.Name), plugin, f, string.IsNullOrEmpty(a.Description) ? null : new ConfigDescription(a.Description), out var e))
                     configs.GetOrCreate(plugin).Add((e, f));
             }
         }
@@ -52,6 +52,7 @@ namespace ConfigTweaks
     {
         public readonly string Key;
         public readonly string Section;
+        public string Description { get; set; }
         public ConfigFieldAttribute(string Key = null,string Section = "Config")
         {
             this.Key = Key;
